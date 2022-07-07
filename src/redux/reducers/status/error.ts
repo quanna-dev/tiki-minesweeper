@@ -1,6 +1,6 @@
 import { getType } from 'deox';
 import { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 import { uiActions } from '@/redux/actions';
 
@@ -48,7 +48,7 @@ const errorReducer = (state: TErrorState = {}, action: IErrorAction | IResetActi
     code = axiosErrorData?.status;
   }
 
-  error && toast.error(error);
+  // error && toast.error(error);
 
   return {
     ...state,
