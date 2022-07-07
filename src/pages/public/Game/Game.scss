@@ -171,7 +171,7 @@
         transform: translate(-40%, 100%);
       }
 
-      &.bottomRightCorner {
+      &.bottomRightCorner, &.rightSide {
         transform: translate(-40%, -100%);
       }
     }

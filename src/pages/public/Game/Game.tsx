@@ -214,6 +214,7 @@ const Game: React.FC<TGameProps> = () => {
                         bottom: cell.y === 0,
                         topRightCorner: cell.x === gameBasicInfo.size - 1 && cell.y === 0,
                         bottomRightCorner: cell.x === gameBasicInfo.size - 1 && cell.y === gameBasicInfo.size - 1,
+                        rightSide: cell.x === gameBasicInfo.size - 1,
                       })}
                       onClick={(): void => openCell(cell)}
                     >
