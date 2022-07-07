@@ -82,7 +82,6 @@ const Game: React.FC<TGameProps> = () => {
   };
 
   const clickToCell = (targetCell: TCellInformation): void => {
-    console.log(targetCell);
     if (!gameStatus.ended) {
       if (isMobile) {
         const gridUpdated = grid.map((cell) => ({
