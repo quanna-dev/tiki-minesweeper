@@ -26,15 +26,23 @@
     background-color: $dodger-blue;
     display: flex;
     justify-content: center;
-    align-items: center;
   }
 
+  &__flagCounter,
+  &__timer {
+    display: flex;
+    align-items: center;
+    padding: 0px 24px;
+  }
+
+  &__flagIcon,
   &__clockIcon {
     width: 40px;
     height: 40px;
   }
 
-  &__timer {
+  &__numberOfFlags,
+  &__seconds {
     color: $white;
     font-family: OpenSans-Light;
     font-size: 24px;
@@ -49,22 +57,35 @@
     max-width: $cell-size;
     max-height: $cell-size;
     cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: $white-alpha-50;
+      display: none;
+    }
 
     &.beginner {
       width: calc(100% / #{$beginner-size});
       height: calc(100vw / #{$beginner-size});
     }
-  
+
     &.advantage {
       width: calc(100% / #{$advantage-size});
       height: calc(100vw / #{$advantage-size});
     }
 
     &:hover {
-      opacity: 0.5;
+      position: relative;
+      &::before {
+        display: block;
+      }
+    }
+
+    &.focusing {
+      position: relative;
     }
 
     &.bold {
@@ -84,6 +105,76 @@
         background-color: $cashmere;
       }
     }
+
+    &-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+  }
+
+  &__setFlagAction,
+  &__mineAction {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: $medium-animation;
+    background-color: $dodger-blue;
+    transform: translate(0%);
+    opacity: 0;
+    visibility: hidden;
+    box-shadow: $hard-shadow;
+    z-index: 2;
+
+    &-icon {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  &__setFlagAction {
+    &.show {
+      opacity: 1;
+      visibility: visible;
+
+      &.left {
+        transform: translate(-80%, 0%);
+      }
+
+      &.right {
+        transform: translate(80%, 0%);
+      }
+    }
+  }
+
+  &__mineAction {
+    &.show {
+      opacity: 1;
+      visibility: visible;
+
+      &.top {
+        transform: translate(0%, -80%);
+      }
+
+      &.bottom {
+        transform: translate(0%, 80%);
+      }
+
+      &.topRightCorner {
+        transform: translate(-40%, 100%);
+      }
+
+      &.bottomRightCorner {
+        transform: translate(-40%, -100%);
+      }
+    }
   }
 
   &__number {
@@ -98,5 +189,10 @@
     height: 16px;
     background-color: $scarlet;
     border-radius: 50%;
+  }
+
+  &__flag {
+    width: 32px;
+    height: 32px;
   }
 }

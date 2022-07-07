@@ -58,7 +58,7 @@ export const getGrid = (mines: TMineCoordinate[], level: EGameLevel): TCellInfor
   const flatenCoordinateCells = coordinateCells.reduce((result, row) => [...result, ...row], []);
   const gridDetectedMines = flatenCoordinateCells.map((cell) => {
     const isMine = !!mines.find((mine) => mine.x === cell.x && mine.y === cell.y);
-    return { ...cell, id: `${cell.x}-${cell.y}`, isMine, isOpen: false };
+    return { ...cell, id: `${cell.x}-${cell.y}`, isMine, isOpen: false, flag: false, focusing: false };
   });
   const gridHasCellsAround = gridDetectedMines.map((cell) => {
     const cellsAround = getCellsAround(gridDetectedMines, cell);

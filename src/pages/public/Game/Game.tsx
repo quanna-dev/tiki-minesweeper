@@ -4,11 +4,13 @@ import { navigate, useParams } from '@reach/router';
 import classNames from 'classnames';
 
 import { EGameLevel } from '@/common-types/common.d';
+import { TOnContext } from '@/common-types/events';
+import { EBreakpoints } from '@/common-types/ui-ux';
 
 import { TRootState } from '@/redux/reducers';
 import { EGetMinesAction, getMinesAction, uiActions } from '@/redux/actions';
 
-import { TGetMinesResponse } from '@/services/tiki-minesweeper';
+import { TGetMinesParams, TGetMinesResponse } from '@/services/tiki-minesweeper';
 
 import { Paths } from '@/pages/routers';
 import LoadingFallback from '@/components/LoadingFallback';
@@ -16,6 +18,8 @@ import ActionModal from '@/components/ActionModal';
 import { EButtonStyleType } from '@/components/Button';
 
 import IconClock from '@/assets/icons/clock.png';
+import IconFlag from '@/assets/icons/flag.png';
+import IconShovel from '@/assets/icons/shovel.png';
 
 import {
   getLevelParams,
@@ -34,6 +38,8 @@ const Game: React.FC<TGameProps> = () => {
   const { level } = useParams();
   const dispatch = useDispatch();
 
+  const deviceWidth = useSelector((state: TRootState) => state?.uiReducer.device.width);
+  const isMobile = deviceWidth <= EBreakpoints.MD;
   const gettingMines = useSelector((state: TRootState) => state?.loadingReducer[EGetMinesAction.GET_MINES]);
   const [grid, setGrid] = useState<TCellInformation[]>([]);
   const [gameStatus, setGameStatus] = useState<{ ended: boolean; playerWins: boolean }>({
@@ -42,6 +48,10 @@ const Game: React.FC<TGameProps> = () => {
   });
   const [timer, setTimer] = useState<string>('000');
   const [startTimer, setStartTimer] = useState<boolean>(false);
+  const [gameBasicInfo, setGameBasicInfo] = useState<TGetMinesParams>({ size: 0, mines: 0 });
+
+  const usedFlags = grid.filter((cell) => cell.flag).length;
+  const restFlags = gameBasicInfo.mines - usedFlags;
 
   const handleGrid = useCallback(
     ({ data: mines }: TGetMinesResponse): void => {
@@ -54,7 +64,7 @@ const Game: React.FC<TGameProps> = () => {
   const exploreAround = (cells: TCellInformation[], targetCell: TCellInformation): TCellInformation[] => {
     let cellsExplored = [...cells];
     const validCellsAround = getCellsAround(cellsExplored, targetCell).filter(
-      (cell) => !cell.isMine && !cell.isOpen,
+      (cell) => !cell.isMine && !cell.isOpen && !cell.flag,
     ) as TCellInformation[];
     cellsExplored = validCellsAround.map((cell) => ({ ...cell, isOpen: true }));
     const cellsNotHaveMinesAround = validCellsAround.filter(
@@ -71,26 +81,55 @@ const Game: React.FC<TGameProps> = () => {
     return cellsExplored;
   };
 
-  const openCell = (targetCell: TCellInformation): void => {
-    if (!gameStatus.ended && !targetCell.isOpen) {
-      const cellId = targetCell.id;
-      const exploredCells = exploreAround(grid, targetCell);
-      const gridUpdated = grid.map((cell) => {
-        const isTargetCell = cell.id === cellId;
-        const cellsAroundNeedExplore = exploredCells.find(
-          (exploredCell) => exploredCell.x === cell.x && exploredCell.y === cell.y,
-        );
-        return isTargetCell || cellsAroundNeedExplore ? { ...cell, isOpen: true } : cell;
-      });
-      const clickOnMine = !!grid.find((cell) => cell.id === cellId && cell.isMine);
-      const finalGrid = clickOnMine
-        ? grid.map((cell) => (cell.isMine ? { ...cell, isOpen: true } : cell))
-        : gridUpdated;
-      const playerWins = finalGrid.filter((cell) => !cell.isMine).every((cell) => cell.isOpen);
-      !startTimer && setStartTimer(true);
-      setGameStatus({ ended: clickOnMine || playerWins, playerWins });
-      setGrid(finalGrid);
+  const clickToCell = (targetCell: TCellInformation): void => {
+    console.log(targetCell);
+    if (!gameStatus.ended) {
+      if (isMobile) {
+        const gridUpdated = grid.map((cell) => ({
+          ...cell,
+          focusing: targetCell.isOpen ? false : cell.id === targetCell.id && !targetCell.focusing && !targetCell.flag,
+          flag: cell.id === targetCell.id ? false : cell.flag,
+        }));
+        setGrid(gridUpdated);
+      } else {
+        !targetCell.flag && !targetCell.isOpen && openCell(targetCell);
+      }
     }
+  };
+
+  const openCell = (targetCell: TCellInformation): void => {
+    const cellId = targetCell.id;
+    const exploredCells = exploreAround(grid, targetCell);
+    const gridUpdated = grid.map((cell) => {
+      const isTargetCell = cell.id === cellId;
+      const cellsAroundNeedExplore = exploredCells.find(
+        (exploredCell) => exploredCell.x === cell.x && exploredCell.y === cell.y,
+      );
+      return isTargetCell || cellsAroundNeedExplore ? { ...cell, isOpen: true, focusing: false } : cell;
+    });
+    const clickOnMine = !!grid.find((cell) => cell.id === cellId && cell.isMine);
+    const finalGrid = clickOnMine
+      ? grid.map((cell) => (cell.isMine ? { ...cell, isOpen: true, focusing: false } : cell))
+      : gridUpdated;
+    const playerWins = finalGrid.filter((cell) => !cell.isMine).every((cell) => cell.isOpen);
+    !startTimer && setStartTimer(true);
+    setGameStatus({ ended: clickOnMine || playerWins, playerWins });
+    setGrid(finalGrid);
+  };
+
+  const rightClickCell = (e: TOnContext, targetCell: TCellInformation): void => {
+    e.preventDefault();
+    setFlag(targetCell);
+  };
+
+  const setFlag = (targetCell: TCellInformation): void => {
+    const stillCanSetFlag = restFlags > 0;
+    const gridUpdated = grid.map((cell) =>
+      cell.id === targetCell.id && !targetCell.isOpen
+        ? { ...cell, flag: stillCanSetFlag ? !cell.flag : false, focusing: false }
+        : cell,
+    );
+    setGrid(gridUpdated);
   };
 
   useEffect(() => {
@@ -110,6 +149,7 @@ const Game: React.FC<TGameProps> = () => {
     const levelIsValid = isValidLevel(level);
     if (levelIsValid) {
       const params = getLevelParams(level);
+      setGameBasicInfo(params);
       dispatch(getMinesAction.request({ params }, handleGrid));
     } else {
       navigate(Paths.Welcome);
@@ -126,8 +166,14 @@ const Game: React.FC<TGameProps> = () => {
     <LoadingFallback loading={gettingMines} fullPage>
       <div className={classNames('Game', level)}>
         <div className="Game__header">
-          <img className="Game__clockIcon" src={IconClock} alt="Timer" />
-          <span className="Game__timer">{timer}</span>
+          <div className="Game__flagCounter">
+            <img className="Game__flagIcon" src={IconFlag} alt="Flags" />
+            <span className="Game__numberOfFlags">{restFlags}</span>
+          </div>
+          <div className="Game__timer">
+            <img className="Game__clockIcon" src={IconClock} alt="Timer" />
+            <span className="Game__seconds">{timer}</span>
+          </div>
         </div>
         <div className="Game__graveYard">
           {grid.map((cell, cellIndex) => {
@@ -143,26 +189,57 @@ const Game: React.FC<TGameProps> = () => {
               <div
                 className={classNames('Game__cell', level, {
                   isOpen: cell.isOpen,
+                  hasFlag: cell.flag,
                   bold: level === EGameLevel.BEGINNER ? boldCellOddYard : boldCellEvenYard,
                   light: level === EGameLevel.BEGINNER ? lightCellOddYard : lightCellEvenYard,
+                  focusing: cell.focusing,
                 })}
                 key={cell.id}
-                onClick={(): void => openCell(cell)}
               >
-                {cell.isOpen && (
-                  <div className="Game__suggestion">
-                    {cell.isMine ? (
-                      <span className="Game__mine" />
-                    ) : (
-                      <span className="Game__number">
-                        {numberOfMinesAroundCell > 0 ? numberOfMinesAroundCell : ''}
-                        {/* <span style={{ color: 'red' }}>
-                          {cell.x}-{cell.y}
-                        </span> */}
-                      </span>
-                    )}
-                  </div>
+                {isMobile && (
+                  <>
+                    <div
+                      className={classNames('Game__setFlagAction', {
+                        show: cell.focusing && restFlags > 0,
+                        left: cell.x > 0,
+                        right: cell.x === 0,
+                      })}
+                      onClick={(): void => setFlag(cell)}
+                    >
+                      <img className="Game__setFlagAction-icon" src={IconFlag} alt="Set Flag" />
+                    </div>
+                    <div
+                      className={classNames('Game__mineAction', {
+                        show: cell.focusing,
+                        top: cell.y > 0,
+                        bottom: cell.y === 0,
+                        topRightCorner: cell.x === gameBasicInfo.size - 1 && cell.y === 0,
+                        bottomRightCorner: cell.x === gameBasicInfo.size - 1 && cell.y === gameBasicInfo.size - 1,
+                      })}
+                      onClick={(): void => openCell(cell)}
+                    >
+                      <img className="Game__mineAction-icon" src={IconShovel} alt="Mine" />
+                    </div>
+                  </>
                 )}
+                <div
+                  className="Game__cell-wrapper"
+                  onClick={(): void => clickToCell(cell)}
+                  onContextMenu={(e): void => rightClickCell(e, cell)}
+                >
+                  {cell.isOpen && (
+                    <div className="Game__suggestion">
+                      {cell.isMine ? (
+                        <span className="Game__mine" />
+                      ) : (
+                        <span className="Game__number">
+                          {numberOfMinesAroundCell > 0 ? numberOfMinesAroundCell : ''}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {cell.flag && !cell.isOpen && <img className="Game__flag" src={IconFlag} alt="Flag" />}
+                </div>
               </div>
             );
           })}

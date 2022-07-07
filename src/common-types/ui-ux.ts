@@ -22,8 +22,9 @@ export enum EDevice {
 
 export enum EColor {
   WHITE = '#ffffff',
+  WHITE_ALPHA_50 = 'rgba(#ffffff, 0.5)',
   BLACK = '#000000',
-  BLACK_ALPHA_8 = 'rgba(#000000, 0.5)',
+  BLACK_ALPHA_50 = 'rgba(#000000, 0.5)',
   ATLANTIS = '#8ecb3a',
   FRUIT_SALAD = '#49934d',
   SUSHI = '#78b833',
