@@ -8,7 +8,7 @@
 
   margin: auto;
   width: 100%;
-  height: calc(100vw + $header-height);
+  height: calc(100vw + #{$header-height});
 
   &.beginner {
     max-width: $beginner-size * $cell-size;
