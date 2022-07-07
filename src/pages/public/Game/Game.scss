@@ -171,7 +171,8 @@
         transform: translate(-40%, 100%);
       }
 
-      &.bottomRightCorner, &.rightSide {
+      &.bottomRightCorner,
+      &.rightSide {
         transform: translate(-40%, -100%);
       }
     }
@@ -192,7 +193,19 @@
   }
 
   &__flag {
-    width: 32px;
-    height: 32px;
+    &.beginner {
+      width: 32px;
+      height: 32px;
+    }
+
+    &.advantage {
+      width: 20px;
+      height: 20px;
+
+      @include min-width-576 {
+        width: 32px;
+        height: 32px;
+      }
+    }
   }
 }

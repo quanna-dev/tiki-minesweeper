@@ -238,7 +238,9 @@ const Game: React.FC<TGameProps> = () => {
                       )}
                     </div>
                   )}
-                  {cell.flag && !cell.isOpen && <img className="Game__flag" src={IconFlag} alt="Flag" />}
+                  {cell.flag && !cell.isOpen && (
+                    <img className={classNames('Game__flag', level)} src={IconFlag} alt="Flag" />
+                  )}
                 </div>
               </div>
             );
