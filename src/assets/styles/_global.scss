@@ -1,0 +1,21 @@
+@import './fonts';
+@import './mixins';
+@import './colors';
+@import './constants';
+@import './main-classes';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  position: relative;
+  width: 100%;
+  font-family: OpenSans-Regular;
+  font-size: $base-font;
+  margin: 0px;
+}
+
+

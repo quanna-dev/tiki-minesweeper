@@ -1,0 +1,66 @@
+@import '@/assets/styles/_global.scss';
+
+#{$ActionModal} {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background-color: $black-alpha-8;
+  transition: $medium-animation;
+  visibility: hidden;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.active {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &__popup {
+    width: 90%;
+    max-width: 500px;
+    background-color: $white;
+    box-shadow: $shadow;
+    border-radius: 12px;
+    padding: 24px;
+    transition: $slowest-animation;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-16px);
+
+    &.active {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0px);
+    }
+
+    &-title {
+      font-size: 20px;
+      margin: 0;
+      text-align: center;
+      font-family: OpenSans-Light;
+
+      @include min-width-576 {
+        font-size: 24px;
+      }
+    }
+
+    &-actions {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 24px;
+
+      #{$Button} {
+        font-size: 16px;
+        padding: 16px 24px;
+
+        @include min-width-576 {
+          padding: 16px 48px;
+        }
+      }
+    }
+  }
+}

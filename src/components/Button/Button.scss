@@ -1,0 +1,22 @@
+@import '@/assets/styles/_global.scss';
+
+#{$Button} {
+  color: $white;
+  text-transform: capitalize;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: $medium-animation;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.primary {
+    background-color: $atlantis;
+  }
+
+  &.secondary {
+    background-color: $scarlet;
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "name": "tiki-minesweeper",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "env-cmd -f .env.development.local react-app-rewired start",
+    "start:production": "env-cmd -f .env.production.local react-app-rewired start",
+    "build:development": "GENERATE_SOURCEMAP=false env-cmd -f .env.development react-app-rewired build",
+    "build-window:development": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.development react-app-rewired build",
+    "build:production": "GENERATE_SOURCEMAP=false env-cmd -f .env.production react-app-rewired build",
+    "build-window:production": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.production react-app-rewired build",
+    "rm-nodemodules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "rm-packagelocks": "find . -name 'package-lock.json' -type f -prune -exec rm -rf '{}' +",
+    "rm-yarnlocks": "find . -name 'yarn.lock' -type f -prune -exec rm -rf '{}' +",
+    "clean": "yarn run rm-nodemodules && yarn run rm-packagelocks && yarn run rm-yarnlocks",
+    "format": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "eslint --fix src/**/*.{ts,tsx}",
+    "lint:staged": "lint-staged",
+    "create-service": "node ./node_modules/react-save-efforts/create-service.js",
+    "create-component": "node ./node_modules/react-save-efforts/create-component.js",
+    "remove-service": "node ./node_modules/react-save-efforts/remove-service.js",
+    "remove-component": "node ./node_modules/react-save-efforts/remove-component.js"
+  },
+  "dependencies": {
+    "@reach/router": "^1.3.4",
+    "axios": "^0.21.1",
+    "classnames": "^2.3.1",
+    "deox": "^3.3.1",
+    "node-sass": "^5.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.3",
+    "react-scripts": "4.0.3",
+    "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-saga": "^1.1.3",
+    "typescript": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.0",
+    "@types/reach__router": "^1.3.7",
+    "@types/react": "^17.0.0",
+    "@types/react-cookies": "^0.1.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-redux": "^7.1.16",
+    "@typescript-eslint/eslint-plugin": "^4.21.0",
+    "@typescript-eslint/parser": "^4.21.0",
+    "customize-cra": "^1.0.0",
+    "env-cmd": "^10.1.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.3.5",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "4.3.8",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "react-app-rewired": "^2.1.8",
+    "react-save-efforts": "^1.0.3"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx}": [
+      "yarn lint",
+      "yarn format"
+    ],
+    "**/*.{tsx,ts}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
