@@ -98,7 +98,8 @@ const Game: React.FC<TGameProps> = () => {
 
   const openCell = (targetCell: TCellInformation): void => {
     const cellId = targetCell.id;
-    const exploredCells = exploreAround(grid, targetCell);
+    const isBlankCell = targetCell.cellsAround.filter((suggestion) => suggestion.isMine).length === 0;
+    const exploredCells = isBlankCell ? exploreAround(grid, targetCell) : [targetCell];
     const gridUpdated = grid.map((cell) => {
       const isTargetCell = cell.id === cellId;
       const cellsAroundNeedExplore = exploredCells.find(
